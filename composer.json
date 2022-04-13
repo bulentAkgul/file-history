@@ -1,0 +1,27 @@
+{
+  "name": "bakgul/file-history",
+  "description": "Add undo/redo functionality when file/folders/packages created through the commandline.",
+  "authors": [
+    {
+      "name": "Bulent Akgul",
+      "email": "bulent.akgul@me.com"
+    }
+  ],
+  "require": {},
+  "require-dev": {
+    "bakgul/kernel": "@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "Bakgul\\FileHistory\\": "src/",
+      "Bakgul\\FileHistory\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Bakgul\\FileHistory\\FileHistoryServiceProvider"
+      ]
+    }
+  }
+}

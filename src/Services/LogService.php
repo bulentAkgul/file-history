@@ -6,7 +6,7 @@ use Bakgul\FileHistory\Helpers\Log;
 use Bakgul\Kernel\Helpers\Folder;
 use Bakgul\Kernel\Helpers\Path;
 use Bakgul\FileContent\Helpers\Content;
-use Bakgul\FileContent\Tasks\CompleteFolders;
+use Bakgul\Kernel\Tasks\CompleteFolders;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 

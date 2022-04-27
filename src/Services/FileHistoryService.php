@@ -3,7 +3,7 @@
 namespace Bakgul\FileHistory\Services;
 
 use Bakgul\Kernel\Helpers\Text;
-use Bakgul\FileContent\Tasks\CompleteFolders;
+use Bakgul\Kernel\Tasks\CompleteFolders;
 use Bakgul\FileHistory\Helpers\Log;
 
 class FileHistoryService

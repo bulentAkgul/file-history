@@ -4,8 +4,8 @@ namespace Bakgul\FileHistory\Helpers;
 
 use Bakgul\Kernel\Helpers\Folder;
 use Bakgul\Kernel\Helpers\Path;
-use Bakgul\Kernel\Helpers\Text;
 use Bakgul\FileHistory\Services\LogService;
+use Bakgul\Kernel\Helpers\Settings;
 
 class Log
 {
@@ -14,42 +14,35 @@ class Log
         return 'x_';
     }
 
-    public static function folder(string $action)
+    public static function path(string $action)
     {
-        return "{$action}Logs";
+        return Path::glue([Settings::logs('path'), $action]);
     }
 
-    public static function path(string $action, string $type = 'file')
+    public static function files(string $action)
     {
-        return Path::realBase(Path::glue(['storage', 'logs', "{$type}Logs", self::folder($action)]));
+        return Folder::content(self::path($action));
     }
 
-    public static function files(string $action, string $type = 'file')
+    public static function isLogsMissing(string $action): bool
     {
-        return Folder::content(self::path($action, $type));
+        return empty(self::files($action));
     }
 
-    public static function isLogsMissing(string $action, string $type = 'file'): bool
-    {
-        return empty(self::files($action, $type));
-    }
-
-    public static function isNoLogLeft(string $action, string $type = 'file'): bool
+    public static function isNoLogLeft(string $action): bool
     {
         return empty(array_filter(
-            self::files($action, $type),
+            self::files($action),
             fn ($x) => !str_contains($x, self::prefix())
         ));
     }
 
     public static function isPairMissing()
     {
-        return !file_exists(
-            Text::prepend(self::path('redo')) . str_replace(
-                self::prefix(),
-                '',
-                LogService::getFirstPrefixedFile(self::path('undo'))
-            ) . '.json'
-        );
+        return !file_exists(str_replace(
+            ['undo', self::prefix()],
+            ['redo', ''],
+            LogService::getFirstPrefixedFile(self::path('undo'))
+        ));
     }
 }

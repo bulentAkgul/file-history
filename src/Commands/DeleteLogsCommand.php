@@ -5,10 +5,11 @@ namespace Bakgul\FileHistory\Commands;
 use Illuminate\Console\Command;
 use Bakgul\Kernel\Helpers\Folder;
 use Bakgul\Kernel\Helpers\Path;
+use Bakgul\Kernel\Helpers\Settings;
 
 class DeleteLogsCommand extends Command
 {
-    protected $signature = 'delete:logs {name}';
+    protected $signature = 'delete:logs';
     protected $description = '';
 
     public function __construct()
@@ -18,7 +19,7 @@ class DeleteLogsCommand extends Command
 
     public function handle()
     {
-        $path = storage_path(Path::glue(['logs', "{$this->argument('name')}Logs"]));
+        $path = Settings::logs('path');
 
         foreach (Folder::content($path) as $folder) {
             foreach (Folder::content(Path::glue([$path, $folder])) as $file) {

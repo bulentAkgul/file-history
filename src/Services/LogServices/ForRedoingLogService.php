@@ -2,39 +2,31 @@
 
 namespace Bakgul\FileHistory\Services\LogServices;
 
-use Bakgul\Kernel\Helpers\Path;
-use Bakgul\FileHistory\Helpers\Log;
+use Bakgul\FileHistory\Functions\SetFile;
 use Bakgul\FileHistory\Services\LogService;
+use Bakgul\Kernel\Helpers\Settings;
 
 class ForRedoingLogService extends LogService
 {
     private static $undo;
 
-    public static function set(string $file = '')
+    public static function set()
     {
-        self::getUndo($file);
+        self::getUndo();
 
-        self::prepare();
-        
+        SetFile::_(['undo', 'redo']);
+
         self::setLog();
+
+        SetFile::_(['redo', 'undo']);
     }
 
-    private static function getUndo(string $file)
+    private static function getUndo()
     {
-        $path = Log::path('undo');
-        $name = $file ?: parent::getFirstPrefixedFile($path);
-
         self::$undo = [
-            'name' => $name,
-            'logs' => parent::getLogs(Path::glue([$path, $name]))
+            'file' => $f = Settings::logs('file'),
+            'logs' => parent::getLogs($f)
         ];
-    }
-
-    private static function prepare()
-    {
-        parent::$path = Log::path('redo');
-
-        parent::$file = self::$undo['name'] ?: parent::file();
     }
 
     private static function setLog()

@@ -2,10 +2,12 @@
 
 namespace Bakgul\FileHistory\Services\HistoryServices;
 
+use Bakgul\FileHistory\Functions\SetFile;
 use Bakgul\FileHistory\Services\FileHistoryService;
 use Bakgul\FileHistory\Services\LogServices\ForRedoingLogService;
+use Bakgul\FileHistory\Tasks\SetLogs;
 use Bakgul\Kernel\Helpers\Folder;
-use Bakgul\Kernel\Helpers\Path;
+use Bakgul\Kernel\Helpers\Settings;
 
 class UndoHistoryService extends FileHistoryService
 {
@@ -13,28 +15,28 @@ class UndoHistoryService extends FileHistoryService
     {
         parent::prepare('undo');
 
-        self::getFileName();
-        
-        if (!self::$file) return parent::result();
-        
-        self::generateRedo();
+        self::getFile();
 
-        self::undo();
+        if (parent::isFileExist()) {
+            self::generateRedo();
 
-        parent::rename(true);
+            self::undo();
+
+            parent::rename(true);
+        }
 
         return parent::result();
     }
 
-    private static function getFileName()
+    private static function getFile()
     {
-        parent::setFileName(parent::$logService->getLastUnprefixedFile(self::$undoPath));
+        SetFile::_([parent::$prefix, ''], parent::$logService->getLastUnprefixedFile(self::$undoPath));
     }
 
     private static function generateRedo()
     {
-        if (!file_exists(Path::glue([parent::$redoPath, self::$file . ".json"]))) {
-            ForRedoingLogService::set(self::$file);
+        if (parent::isFileMissing(['undo', 'redo'])) {
+            ForRedoingLogService::set();
         }
     }
 
@@ -42,7 +44,7 @@ class UndoHistoryService extends FileHistoryService
     {
         array_map(
             fn ($x) => $x['delete'] ? self::delete($x['path']) : parent::retrieve($x, 'undo'),
-            parent::setLogs()
+            SetLogs::_(parent::$action, parent::$logService)
         );
     }
 
@@ -51,7 +53,7 @@ class UndoHistoryService extends FileHistoryService
         if (!file_exists($path)) {
             return parent::appendStep($path, 'Unable to delete a missing item:', 'failed');
         }
-        
+
         if (is_file($path)) {
             parent::appendStep($path, 'A file deleted:  ');
             return unlink($path);

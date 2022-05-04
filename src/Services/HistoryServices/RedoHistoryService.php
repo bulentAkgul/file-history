@@ -2,7 +2,10 @@
 
 namespace Bakgul\FileHistory\Services\HistoryServices;
 
+use Bakgul\FileHistory\Functions\SetFile;
 use Bakgul\FileHistory\Services\FileHistoryService;
+use Bakgul\FileHistory\Tasks\SetLogs;
+use Bakgul\Kernel\Helpers\Settings;
 
 class RedoHistoryService extends FileHistoryService
 {
@@ -10,22 +13,35 @@ class RedoHistoryService extends FileHistoryService
     {
         parent::prepare('redo');
 
-        self::getFileName();
+        self::getFile();
 
         self::redo();
+
+        SetFile::_(['redo', 'undo']);
 
         parent::rename(false);
 
         return parent::result();
     }
 
-    private static function getFileName()
+    private static function getFile()
     {
-        parent::setFileName(parent::$logService->getFirstPrefixedFile(parent::$undoPath));
+        SetFile::_(
+            [['undo', parent::$prefix], ['redo', '']],
+            parent::$logService->getFirstPrefixedFile(parent::$undoPath)
+        );
+    }
+
+    protected static function swap($map, $string = '')
+    {
+        return str_replace($map[0], $map[1], $string ?: Settings::logs('file'));
     }
 
     private static function redo()
     {
-        array_map(fn ($x) => parent::retrieve($x, 'redo'), parent::setLogs());
+        array_map(
+            fn ($x) => parent::retrieve($x, 'redo'),
+            SetLogs::_(parent::$action, parent::$logService)
+        );
     }
 }

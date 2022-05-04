@@ -2,8 +2,8 @@
 
 namespace Bakgul\FileHistory\Services\LogServices;
 
-use Bakgul\FileHistory\Helpers\Log;
 use Bakgul\FileHistory\Services\LogService;
+use Bakgul\Kernel\Helpers\Settings;
 
 class ForUndoingLogService extends LogService
 {
@@ -23,9 +23,9 @@ class ForUndoingLogService extends LogService
 
     private static function prepare()
     {
-        parent::$path = Log::path('undo');
+        parent::$path = Settings::logs('path');
 
-        parent::$file = parent::file();
+        parent::$file = Settings::logs('file');
 
         parent::$content = parent::getLogs();
     }

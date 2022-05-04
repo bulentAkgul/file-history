@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 
 class UndoCommand extends Command
 {
-    protected $signature = 'undo:file';
+    protected $signature = 'undo:pl';
     protected $description = '';
 
     public function __construct()
@@ -29,7 +29,7 @@ class UndoCommand extends Command
 
     private function inform(string $key)
     {
-        $this->warn(Settings::messages("command.{$key}"));
+        $this->warn(Settings::messages("history.{$key}"));
     }
 
     private function displayResults(array $results)

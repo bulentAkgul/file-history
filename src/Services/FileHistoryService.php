@@ -5,44 +5,32 @@ namespace Bakgul\FileHistory\Services;
 use Bakgul\Kernel\Helpers\Text;
 use Bakgul\Kernel\Tasks\CompleteFolders;
 use Bakgul\FileHistory\Helpers\Log;
+use Bakgul\Kernel\Helpers\Settings;
 
 class FileHistoryService
 {
     protected static $logService;
-    protected static $redoPath;
     protected static $undoPath;
     protected static $prefix;
-    protected static $file;
     protected static $action;
     protected static $steps = [];
 
     public static function prepare(string $action)
     {
-        self::setLogService();
-        self::setPaths();
-        self::getPrefix();
+        self::$logService = new LogService;
+        self::$undoPath = Log::path('undo');
+        self::$prefix = Log::prefix();
         self::$action = $action;
     }
 
-    private static function setLogService()
+    protected static function isFileMissing(array $map): bool
     {
-        self::$logService = new LogService;
+        return !file_exists(str_replace($map[0], $map[1], Settings::logs('file')));
     }
 
-    private static function setPaths()
+    protected static function isFileExist(): bool
     {
-        self::$undoPath = Log::path('undo');
-        self::$redoPath = Log::path('redo');
-    }
-
-    private static function getPrefix()
-    {
-        self::$prefix = Log::prefix();
-    }
-
-    protected static function setFileName(string $name)
-    {
-        self::$file = (int) str_replace(self::$prefix, '', $name);
+        return file_exists(Settings::logs('file'));
     }
 
     protected static function retrieve(array $log, string $action): void
@@ -61,7 +49,7 @@ class FileHistoryService
         $folders = CompleteFolders::_(
             $log['isDir'] ? $log['path'] : Text::dropTail($log['path'])
         );
-        
+
         self::appendSteps($folders, 'A folder created:');
     }
 
@@ -82,14 +70,14 @@ class FileHistoryService
         if (!file_exists($log['path'])) {
             self::appendStep($log['path'], 'A file created:  ');
         }
-        
+
         file_put_contents($log['path'], '');
     }
-    
+
     public static function fillFile(array $log)
     {
         if ($log['isDir']) return;
-        
+
         foreach ($log['content'] as $line) {
             file_put_contents($log['path'], $line, FILE_APPEND);
         }
@@ -100,61 +88,16 @@ class FileHistoryService
     protected static function rename(bool $isUndo)
     {
         rename(
-            self::path('undoPath', $isUndo ? '' : self::$prefix) . ".json",
-            self::path('undoPath', $isUndo ? self::$prefix : '') . ".json"
+            self::file($isUndo ? '' : self::$prefix),
+            self::file($isUndo ? self::$prefix : '')
         );
     }
 
-    protected static function path(string $path, string $prefix = '')
+    protected static function file(string $prefix)
     {
-        return self::$$path . Text::append($prefix . self::$file);
+        return Text::changeTail(Settings::logs('file'), $prefix . Text::getTail(Settings::logs('file')));
     }
 
-    public static function setLogs(): array
-    {
-        return self::combine(self::group(self::getLogs()));
-    }
-
-    private static function getLogs(): array
-    {
-        return self::$logService->getLogs(self::path(self::$action . 'Path'));
-    }
-
-    public static function group(array $logs)
-    {
-        $groups = ['folders' => [], 'files' => []];
-
-        foreach ($logs as $log) {
-            $groups[$log['isDir'] ? 'folders' : 'files'][] = $log;
-        }
-
-        return $groups;
-    }
-
-    public static function combine(array $groups)
-    {
-        $order = self::getOrder();
-
-        $groups['folders'] = self::order($groups['folders']);
-
-        return array_merge($groups[$order[0]], $groups[$order[1]]);
-    }
-
-    private static function getOrder()
-    {
-        return [
-            'undo' => ['files', 'folders'],
-            'redo' => ['folders', 'files']
-        ][self::$action];
-    }
-
-    private static function order($folders)
-    {
-        array_multisort($folders);
-
-        return self::$action == 'undo' ? array_reverse($folders): $folders;
-    }
-    
     protected static function result(): array
     {
         return self::$steps;

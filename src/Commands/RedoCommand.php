@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 
 class RedoCommand extends Command
 {
-    protected $signature = 'redo:file';
+    protected $signature = 'redo:pl';
     protected $description = '';
 
     public function __construct()
@@ -22,7 +22,7 @@ class RedoCommand extends Command
         if (Log::isLogsMissing('redo')) return $this->inform('nothing');
         if (Log::isPairMissing()) return $this->inform('pairless');
         if (Log::isNoLogLeft('redo')) return $this->inform('nomore');
-
+        
         $results = RedoHistoryService::run();
 
         $this->displayResults($results);
@@ -30,7 +30,7 @@ class RedoCommand extends Command
 
     private function inform(string $key)
     {
-        $this->warn(Settings::messages("command.{$key}"));
+        $this->warn(Settings::messages("history.{$key}"));
     }
 
     private function displayResults(array $results)

@@ -2,12 +2,13 @@
 
 namespace Bakgul\FileHistory;
 
+use Bakgul\Kernel\Concerns\HasConfig;
 use Illuminate\Support\ServiceProvider;
-use Bakgul\Kernel\Helpers\Folder;
-use Bakgul\Kernel\Helpers\Path;
 
 class FileHistoryServiceProvider extends ServiceProvider
 {
+    use HasConfig;
+    
     public function boot()
     {
         $this->commands([
@@ -19,28 +20,6 @@ class FileHistoryServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->registerConfig();
-    }
-
-    private function registerConfig()
-    {
-        foreach ($this->getConfigFiles() as $key => $file) {
-            config()->set("packagify.{$key}", require $file);
-        }
-    }
-
-    private function getConfigFiles()
-    {
-        $path = Path::glue([__DIR__, '..', 'config']);
-
-        if (!file_exists($path)) return [];
-
-        $files = [];
-
-        foreach (Folder::content($path) as $file) {
-            $files[str_replace('.php', '', $file)] = Path::glue([$path, $file]);
-        }
-
-        return $files;
+        $this->registerConfigs(__DIR__ . DIRECTORY_SEPARATOR . '..');
     }
 }

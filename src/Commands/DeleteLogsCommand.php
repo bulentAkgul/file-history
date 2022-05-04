@@ -9,7 +9,7 @@ use Bakgul\Kernel\Helpers\Settings;
 
 class DeleteLogsCommand extends Command
 {
-    protected $signature = 'delete:logs';
+    protected $signature = 'delete-logs';
     protected $description = '';
 
     public function __construct()

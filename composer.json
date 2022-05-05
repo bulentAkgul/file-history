@@ -7,10 +7,11 @@
       "email": "bulent.akgul@me.com"
     }
   ],
-  "require": {},
-  "require-dev": {
-    "bakgul/kernel": "@dev"
+  "require": {
+    "php": "^8.0.2",
+    "bakgul/kernel": "0.1.*"
   },
+  "require-dev": {},
   "autoload": {
     "psr-4": {
       "Bakgul\\FileHistory\\": "src/",

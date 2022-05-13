@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 
 class UndoCommand extends Command
 {
-    protected $signature = 'undo-logs';
+    protected $signature = 'undo-log';
     protected $description = '';
 
     public function __construct()

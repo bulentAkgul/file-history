@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 
 class RedoCommand extends Command
 {
-    protected $signature = 'redo-logs';
+    protected $signature = 'redo-log';
     protected $description = '';
 
     public function __construct()

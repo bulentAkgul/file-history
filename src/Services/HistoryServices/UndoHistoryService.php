@@ -50,6 +50,8 @@ class UndoHistoryService extends FileHistoryService
 
     private static function delete(string $path)
     {
+        $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+        
         if (!file_exists($path)) {
             return parent::appendStep($path, 'Unable to delete a missing item:', 'failed');
         }

@@ -35,6 +35,8 @@ class FileHistoryService
 
     protected static function retrieve(array $log, string $action): void
     {
+        $log['path'] = str_replace('/', DIRECTORY_SEPARATOR, $log['path']);
+
         self::completeFolders($log, $action);
 
         self::prepareFile($log);

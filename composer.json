@@ -1,6 +1,6 @@
 {
   "name": "bakgul/file-history",
-  "description": "A helper package to add undo/redo functionality when file/folders/packages created through the commandline.",
+  "description": "This is a helper package, and it can't be used independently. Its purpose is to log the changes of files when they are created/deleted/updated through the commands shipped with the packages, which are part of Packagified Laravel. So this package can't track the changes made manually.",
   "authors": [
     {
       "name": "Bulent Akgul",

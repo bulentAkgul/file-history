@@ -7,7 +7,7 @@ use Bakgul\FileHistory\Services\FileHistoryService;
 use Bakgul\FileHistory\Services\LogServices\ForRedoingLogService;
 use Bakgul\FileHistory\Tasks\SetLogs;
 use Bakgul\Kernel\Helpers\Folder;
-use Bakgul\Kernel\Helpers\Settings;
+use Bakgul\Kernel\Helpers\Path;
 
 class UndoHistoryService extends FileHistoryService
 {
@@ -50,7 +50,7 @@ class UndoHistoryService extends FileHistoryService
 
     private static function delete(string $path)
     {
-        $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+        $path = Path::adapt($path);
         
         if (!file_exists($path)) {
             return parent::appendStep($path, 'Unable to delete a missing item:', 'failed');

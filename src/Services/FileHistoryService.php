@@ -5,6 +5,7 @@ namespace Bakgul\FileHistory\Services;
 use Bakgul\Kernel\Helpers\Text;
 use Bakgul\Kernel\Tasks\CompleteFolders;
 use Bakgul\FileHistory\Helpers\Log;
+use Bakgul\Kernel\Helpers\Path;
 use Bakgul\Kernel\Helpers\Settings;
 
 class FileHistoryService
@@ -35,7 +36,7 @@ class FileHistoryService
 
     protected static function retrieve(array $log, string $action): void
     {
-        $log['path'] = str_replace('/', DIRECTORY_SEPARATOR, $log['path']);
+        $log['path'] = Path::adapt($log['path']);
 
         self::completeFolders($log, $action);
 
